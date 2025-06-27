@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal QA Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-robot"></i> Multimodal QA Agent</h1>
+                <p>Upload an image or provide a URL, then ask any question about it!</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <div class="image-input-area">
+                    <h3><i class="fas fa-image"></i> Image Input</h3>
+                    
+                    <!-- Image Upload -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p>Drag & drop an image here or <span class="upload-link">click to browse</span></p>
+                            <input type="file" id="imageUpload" accept="image/*" hidden>
+                        </div>
+                    </div>
+
+                    <!-- OR divider -->
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+
+                    <!-- URL Input -->
+                    <div class="url-input-group">
+                        <input type="url" id="imageUrl" placeholder="Enter image URL (https://...)">
+                        <button type="button" id="loadUrlBtn" class="load-url-btn">
+                            <i class="fas fa-link"></i> Load
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Image Preview -->
+                <div class="image-preview" id="imagePreview" style="display: none;">
+                    <h4><i class="fas fa-eye"></i> Image Preview</h4>
+                    <div class="preview-container">
+                        <img id="previewImg" alt="Preview">
+                        <button type="button" id="clearImageBtn" class="clear-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Input -->
+                <div class="question-input-area">
+                    <h3><i class="fas fa-question-circle"></i> Your Question</h3>
+                    <div class="question-input-group">
+                        <textarea 
+                            id="questionInput" 
+                            placeholder="What would you like to know about this image? (e.g., 'What objects do you see?', 'Describe the scene', 'What colors are prominent?')"
+                            rows="3"
+                        ></textarea>
+                        <div class="quick-questions">
+                            <span class="quick-question-label">Quick questions:</span>
+                            <button type="button" class="quick-btn" data-question="What do you see in this image?">What do you see?</button>
+                            <button type="button" class="quick-btn" data-question="Describe this image in detail.">Describe in detail</button>
+                            <button type="button" class="quick-btn" data-question="What are the main objects in this image?">Main objects</button>
+                            <button type="button" class="quick-btn" data-question="What colors are prominent in this image?">Colors</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" id="analyzeBtn" class="analyze-btn" disabled>
+                    <i class="fas fa-magic"></i>
+                    <span class="btn-text">Analyze Image</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Analyzing...
+                    </span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3><i class="fas fa-brain"></i> AI Response</h3>
+                <div class="response-container">
+                    <div class="response-header">
+                        <span class="model-info" id="modelInfo"></span>
+                        <span class="fallback-indicator" id="fallbackIndicator" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i> Fallback Mode
+                        </span>
+                    </div>
+                    <div class="response-content" id="responseContent"></div>
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div class="error-section" id="errorSection" style="display: none;">
+                <div class="error-container">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage"></span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sample Images Section -->
+        <section class="samples-section">
+            <h3><i class="fas fa-images"></i> Try These Sample Images</h3>
+            <div class="sample-images">
+                <div class="sample-item" data-url="https://science.nasa.gov/wp-content/uploads/2023/09/web-first-images-release.png">
+                    <img src="https://science.nasa.gov/wp-content/uploads/2023/09/web-first-images-release.png" alt="NASA Webb Space Telescope">
+                    <p>NASA Webb Space Telescope</p>
+                </div>
+                <div class="sample-item" data-url="https://images.unsplash.com/photo-1541963463532-d68292c34d19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                    <img src="https://images.unsplash.com/photo-1541963463532-d68292c34d19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Books and Coffee">
+                    <p>Books and Coffee</p>
+                </div>
+                <div class="sample-item" data-url="https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                    <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Golden Retriever">
+                    <p>Golden Retriever</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>
+                <i class="fas fa-cog"></i> 
+                Powered by <strong>Grok-2-Vision</strong> | 
+                Built with <i class="fas fa-heart"></i> for multimodal AI
+            </p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
