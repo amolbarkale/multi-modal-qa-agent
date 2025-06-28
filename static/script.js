@@ -1,4 +1,5 @@
 // DOM Elements
+console.log('DOM Elements:')
 const uploadArea = document.getElementById('uploadArea');
 const imageUpload = document.getElementById('imageUpload');
 const imageUrl = document.getElementById('imageUrl');
